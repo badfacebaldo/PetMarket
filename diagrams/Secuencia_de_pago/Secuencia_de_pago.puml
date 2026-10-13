@@ -1,0 +1,34 @@
+@startuml
+title Secuencia: Iniciar Checkout, Reserva y Pago Confirmado (CU-01 y CU-02)
+skinparam shadowing false
+skinparam defaultFontName Arial
+autonumber
+
+actor Cliente
+participant "PaymentApplicationService" as PAS
+participant "ProcesarPagoHandler" as PPH
+participant "UnitOfWork" as UOW
+participant "InventoryRepository" as IR
+participant "OrderRepository" as OR
+participant "IPaymentGatewayAdapter" as PGA
+
+Cliente -> PAS : procesarPago(checkoutId, tokenPago, monto)
+PAS -> PPH : manejar(ProcesarPagoCommand)
+PPH -> UOW : iniciar()
+PPH -> IR : revalidarStock(checkoutId)
+IR --> PPH : stockDisponibleConfirmado (RN-05)
+
+alt Monto > $15,000 MXN (RN-09)
+    PPH -> OR : guardarEnEstadoRevisionAntifraude()
+    PPH -> UOW : confirmar()
+    PPH --> Cliente : PedidoEnRevisiónAntifraude (24h)
+else Monto <= $15,000 MXN (Flujo Normal)
+    PPH -> PGA : cobroTokenizado(tokenPago, monto)
+    PGA --> PPH : pagoExitoso
+    PPH -> OR : guardarPedidoConfirmado()
+    PPH -> IR : consolidarDescuentoInventario()
+    PPH -> UOW : confirmar()
+    PPH --> PAS : PagoConfirmadoDto
+    PAS --> Cliente : Confirmación de Pedido y Pasa a Preparación
+end
+@enduml
