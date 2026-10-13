@@ -1,0 +1,113 @@
+@startuml
+title PetMarket - Diagrama de Clases (Dominio, Aplicación e Infraestructura)
+skinparam shadowing false
+skinparam defaultFontName Arial
+
+package "Dominio" #E1F5EE {
+  class Pedido <<AggregateRoot>> {
+    +PedidoId id
+    +ClienteId clienteId
+    +EstadoPedido estado
+    +Dinero total
+    +crearPedido()
+    +confirmarPago()
+    +dividirEnSubEnvios()
+    +cancelar()
+  }
+
+  class SubEnvio <<Entity>> {
+    +SubEnvioId id
+    +AlmacenId almacenId
+    +GuiaRastreo guia
+    +EstadoSubEnvio estado
+  }
+
+  class AlmacenStock <<AggregateRoot>> {
+    +AlmacenId almacenId
+    +SKU sku
+    +CantidadStock fisica
+    +CantidadStock reservada
+    +reservarStock(15min)
+    +revalidarDisponibilidad()
+    +liberarReserva()
+  }
+
+  class Devolucion <<AggregateRoot>> {
+    +DevolucionId id
+    +PedidoId pedidoId
+    +MotivoDevolucion motivo
+    +EvidenciaFotografica evidencia
+    +Boolean aprobadaPorSupervisor
+    +aprobar()
+  }
+
+  interface IOrderRepository {
+    +obtenerPorId(id)
+    +guardar(pedido)
+  }
+
+  interface IInventoryRepository {
+    +obtenerStock(sku, almacenId)
+    +guardarStock(stock)
+  }
+
+  interface IReturnRepository {
+    +obtenerPorId(id)
+    +guardar(devolucion)
+  }
+
+  interface IUnitOfWork {
+    +iniciar()
+    +confirmar()
+    +deshacer()
+  }
+
+  Pedido "1" *-- "1..*" SubEnvio : contiene
+  Pedido ..> IOrderRepository
+  AlmacenStock ..> IInventoryRepository
+  Devolucion ..> IReturnRepository
+}
+
+package "Aplicación" #E3F2FD {
+  class CheckoutApplicationService <<ApplicationService>> {
+    +iniciarCheckout(solicitud)
+  }
+  class PaymentApplicationService <<ApplicationService>> {
+    +procesarPago(solicitud)
+  }
+  class CustomerSupportApplicationService <<ApplicationService>> {
+    +cancelarPedido(solicitud)
+    +procesarDevolucion(solicitud)
+  }
+
+  class IniciarCheckoutHandler <<CommandHandler>> {
+    +manejar(command)
+  }
+  class ProcesarPagoHandler <<CommandHandler>> {
+    +manejar(command)
+  }
+
+  CheckoutApplicationService --> IniciarCheckoutHandler
+  PaymentApplicationService --> ProcesarPagoHandler
+  IniciarCheckoutHandler ..> IInventoryRepository
+  IniciarCheckoutHandler ..> IUnitOfWork
+  ProcesarPagoHandler ..> IOrderRepository
+  ProcesarPagoHandler ..> IUnitOfWork
+}
+
+package "Infraestructura" #FFF3E0 {
+  class OrderRepositorySql implements IOrderRepository {
+    +obtenerPorId(id)
+    +guardar(pedido)
+  }
+  class InventoryRepositorySql implements IInventoryRepository {
+    +obtenerStock(sku, almacenId)
+    +guardarStock(stock)
+  }
+  class UnitOfWorkSql implements IUnitOfWork {
+    +iniciar()
+    +confirmar()
+    +deshacer()
+  }
+}
+@enduml
