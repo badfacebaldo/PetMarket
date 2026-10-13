@@ -8,7 +8,7 @@
 * **José Osvaldo Barcenas González** (Matrícula: 2158657)
 * **Gerzayn Flores Rodriguez** (Matrícula: 2160879)
 
-## 📋 Descripción del Proyecto
+## Descripción del Proyecto
 Este repositorio contiene el diseño arquitectónico de **PetMarket**, una plataforma de comercio electrónico de comestibles y artículos para mascotas. En esta etapa (Unidad 3), convertimos los requerimientos del BRD y las 21 historias de usuario de la Unidad 2 en un diseño robusto basado en **Domain Model**, aplicando separación estricta de capas (Dominio, Aplicación e Infraestructura), patrones de persistencia (`Repository` y `Unit of Work`), CQRS básico y principios SOLID.
 
 ## Estructura del Repositorio
