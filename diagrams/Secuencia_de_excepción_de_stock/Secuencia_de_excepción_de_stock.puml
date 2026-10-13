@@ -1,1 +1,24 @@
+@startuml
+title Secuencia: Excepción por Stock Agotado durante Revalidación de Pago (CU-02 Camino de Rechazo)
+skinparam shadowing false
+skinparam defaultFontName Arial
+autonumber
 
+actor Cliente
+participant "PaymentApplicationService" as PAS
+participant "ProcesarPagoHandler" as PPH
+participant "UnitOfWork" as UOW
+participant "InventoryRepository" as IR
+
+Cliente -> PAS : procesarPago(checkoutId, tokenPago)
+PAS -> PPH : manejar(ProcesarPagoCommand)
+PPH -> UOW : iniciar()
+PPH -> IR : revalidarStock(checkoutId)
+IR --> PPH : Error: StockAgotadoEnRevalidación (RN-05, RN-06)
+
+PPH -> IR : liberarReservaTemporal(15min)
+PPH -> UOW : deshacer() (Rollback: No se realiza cobro)
+PPH --> PAS : ExcepcionStockAgotado
+
+PAS --> Cliente : Presentar 3 Opciones (RN-06):\n1. Eliminar ítem agotado\n2. Esperar reabastecimiento\n3. Sustituir por producto similar
+@enduml
