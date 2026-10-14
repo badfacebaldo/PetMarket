@@ -20,4 +20,3 @@ PetMarket-Arquitectura/
 ├── src/                       # Código fuente organizado por capas (Domain, Application, Infrastructure)
 ├── tests/                     # Casos de prueba e validación de reglas de negocio
 └── README.md                  # Descripción general del repositorio
-└── README.md                  # Página principal del repositorio
