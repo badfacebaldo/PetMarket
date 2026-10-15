@@ -3,7 +3,7 @@
 **Profesor:** Miguel Ángel Gómez Marroquín  
 **Facultad de Ingeniería Mecánica y Eléctrica (FIME), UANL**  
 
-## Integrantes del Equipo 3:
+## Integrantes del Equipo 13:
 * **Osmel De Jesús Pérez Carrizales** (Matrícula: 2157401)
 * **José Osvaldo Barcenas González** (Matrícula: 2158657)
 * **Gerzayn Flores Rodriguez** (Matrícula: 2160879)
